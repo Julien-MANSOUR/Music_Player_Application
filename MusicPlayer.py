@@ -1,7 +1,8 @@
 import sys
 from PyQt5.QtWidgets import*
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize,Qt
+
 class Player(QWidget):
     def __init__(self):
         super().__init__()
@@ -46,6 +47,12 @@ class Player(QWidget):
         self.muteButton.setIcon(QIcon("images/mute.png"))
         self.muteButton.setIconSize(QSize(24, 24))
         self.muteButton.setToolTip("Mute")  # just adding a hint to my buttons
+        ###################Volume Slider##############################
+        self.volumeSlider=QSlider(Qt.Horizontal)
+        self.volumeSlider.setToolTip("Volume")
+
+        #################Play List###################################
+        self.playList=QListWidget()
 
     def layouts(self):
         #################creating Layouts#####################
@@ -66,21 +73,18 @@ class Player(QWidget):
         self.middleLayout.addWidget(self.previousButton)
         self.middleLayout.addWidget(self.playButton)
         self.middleLayout.addWidget(self.nextButton)
+        self.middleLayout.addWidget(self.volumeSlider)
         self.middleLayout.addWidget(self.muteButton)
         self.middleLayout.addStretch()
+        #################Bottom Layout##################################
+        self.bottomLayout.addWidget(self.playList)
 
-        
-        
-        
-        
-        
-        
         self.topMainLayout.addLayout(self.topLayout)
         self.topMainLayout.addLayout(self.middleLayout)
         self.topGroupBox.setLayout(self.topMainLayout)#so now the top and middle layout are now in a single groupe box forming the upper layout of main window
         self.topGroupBox.setStyleSheet("background-color : orange")
-        self.mainLayout.addWidget(self.topGroupBox)#topgroupebox is a widget and not a layout
-        self.mainLayout.addLayout(self.bottomLayout)
+        self.mainLayout.addWidget(self.topGroupBox,25)#topgroupebox is a widget and not a layout
+        self.mainLayout.addLayout(self.bottomLayout,75)
         self.setLayout(self.mainLayout)
 
 def main():
