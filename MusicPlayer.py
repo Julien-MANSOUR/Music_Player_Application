@@ -3,6 +3,10 @@ from PyQt5.QtWidgets import*
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize,Qt
 import os
+import random
+
+musicList=[]
+
 class Player(QWidget):
     def __init__(self):
         super().__init__()
@@ -28,7 +32,7 @@ class Player(QWidget):
         self.shuffleButton.setIcon(QIcon("images/shuffle.png"))
         self.shuffleButton.setIconSize(QSize(48, 48))
         self.shuffleButton.setToolTip("Add a Song")  # just adding a hint to my buttons
-
+        self.shuffleButton.clicked.connect(self.shufflePlayList)
         self.previousButton = QToolButton()  # im using toolbutton bcz it is better to use icons to it
         self.previousButton.setIcon(QIcon("images/previous.png"))
         self.previousButton.setIconSize(QSize(48, 48))
@@ -94,6 +98,15 @@ class Player(QWidget):
         fileName=os.path.basename(dir[0])
         #fileName => red.mp3 ,we need just the base name so we can play the song later
         self.playList.addItem(fileName)
+        musicList.append(dir[0])#i want to use the url
+    def shufflePlayList(self):
+        #i need an iterable to use random speciasl function to shuffle
+        random.shuffle(musicList)
+        #we need to update our list
+        self.playList.clear()
+        for song in musicList:
+            fileName = os.path.basename(song)
+            self.playList.addItem(fileName)
 
 def main():
     App=QApplication(sys.argv)
