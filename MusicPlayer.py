@@ -1,15 +1,18 @@
 import sys
 from PyQt5.QtWidgets import*
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QSize,Qt
+from PyQt5.QtCore import QSize,Qt,QTimer
 import os
 import random
 from pygame import mixer
+from mutagen.mp3 import MP3
+from mutagen.wave import WAVE #i used wave bcz mp3 isnt working
 musicList=[]
 muted=False
+songLength =0
 #if you want to utilse mixer you should initialise it
 mixer.init()#global initialisation outside the classs
-
+count =0 #for timer
 class Player(QWidget):
     def __init__(self):
         super().__init__()
@@ -69,6 +72,10 @@ class Player(QWidget):
         #################Play List###################################
         self.playList=QListWidget()
         self.playList.doubleClicked.connect(self.playSounds)
+        ##################Timer##################################3
+        self.timer=QTimer()
+        self.timer.setInterval(1000)
+        self.timer.timeout.connect(self.updateProgressBar)
     def layouts(self):
         #################creating Layouts#####################
         self.mainLayout=QVBoxLayout()
@@ -123,6 +130,9 @@ class Player(QWidget):
         '''pygame works perfectly with .wav format but not with mp3 on ubunto, it might works on window ,
         but in all cases we can add some lines of code to convert every mp3 files into wav format to avoid any kind of problem'''
         global musicList
+        global songLength
+        global  count
+        count =0 #so our progressbar start freshly from zero and not the last accumulated number
         index=self.playList.currentRow()
         print(index)
         print(musicList[index])
@@ -130,7 +140,16 @@ class Player(QWidget):
         try:
             mixer.init(frequency=22050, size=-16, channels=2, buffer=4096)
             mixer.music.load(str(musicList[index]))
+            self.progressBar.setValue(0)#start a fresh start
             mixer.music.play()
+            self.timer.start()#i should start my timer whenever i start the music
+            sound=WAVE(str(musicList[index]))#our song
+            songLength=sound.info.length#we took the length
+            print(songLength)#songLength=12.84513153 //we need just the unite
+            songLength=round(songLength)
+            print(songLength)#=>13
+            self.progressBar.setMaximum(songLength)
+
         except:
             print("cant")
 
@@ -153,6 +172,15 @@ class Player(QWidget):
             self.muteButton.setIcon(QIcon("images/mute.png"))
             self.muteButton.setToolTip("Mute")
             self.volumeSlider.setValue(70)
+    def updateProgressBar(self):
+        global count
+        global songLength
+        #mutagen package will help us to find the length of our song, so we could know when its over
+        count +=1
+        self.progressBar.setValue(count)
+        if count == songLength:
+            self.timer.stop()
+
 def main():
     App=QApplication(sys.argv)
     window=Player()
