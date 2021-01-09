@@ -4,8 +4,11 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize,Qt
 import os
 import random
-
+from pygame import mixer
 musicList=[]
+
+#if you want to utilse mixer you should initialise it
+mixer.init()#global initialisation outside the classs
 
 class Player(QWidget):
     def __init__(self):
@@ -33,6 +36,7 @@ class Player(QWidget):
         self.shuffleButton.setIconSize(QSize(48, 48))
         self.shuffleButton.setToolTip("Add a Song")  # just adding a hint to my buttons
         self.shuffleButton.clicked.connect(self.shufflePlayList)
+
         self.previousButton = QToolButton()  # im using toolbutton bcz it is better to use icons to it
         self.previousButton.setIcon(QIcon("images/previous.png"))
         self.previousButton.setIconSize(QSize(48, 48))
@@ -42,6 +46,7 @@ class Player(QWidget):
         self.playButton.setIcon(QIcon("images/play.png"))
         self.playButton.setIconSize(QSize(64, 64))
         self.playButton.setToolTip("Add a Song")  # just adding a hint to my buttons
+        self.playButton.clicked.connect(self.playSounds)
 
         self.nextButton = QToolButton()  # im using toolbutton bcz it is better to use icons to it
         self.nextButton.setIcon(QIcon("images/next.png"))
@@ -58,7 +63,7 @@ class Player(QWidget):
 
         #################Play List###################################
         self.playList=QListWidget()
-
+        self.playList.doubleClicked.connect(self.playSounds)
     def layouts(self):
         #################creating Layouts#####################
         self.mainLayout=QVBoxLayout()
@@ -99,7 +104,9 @@ class Player(QWidget):
         #fileName => red.mp3 ,we need just the base name so we can play the song later
         self.playList.addItem(fileName)
         musicList.append(dir[0])#i want to use the url
+
     def shufflePlayList(self):
+        global musicList
         #i need an iterable to use random speciasl function to shuffle
         random.shuffle(musicList)
         #we need to update our list
@@ -107,6 +114,20 @@ class Player(QWidget):
         for song in musicList:
             fileName = os.path.basename(song)
             self.playList.addItem(fileName)
+    def playSounds(self):
+        global musicList
+        index=self.playList.currentRow()
+        print(index)
+        print(musicList[index])
+        #we use index for each song so we can play it
+        try:
+            mixer.init(frequency=22050, size=-16, channels=2, buffer=4096)
+            mixer.music.load(str(musicList[index]))
+            mixer.music.play()
+        except:
+            print("cant")
+
+
 
 def main():
     App=QApplication(sys.argv)
