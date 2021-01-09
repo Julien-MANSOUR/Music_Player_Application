@@ -60,7 +60,11 @@ class Player(QWidget):
         ###################Volume Slider##############################
         self.volumeSlider=QSlider(Qt.Horizontal)
         self.volumeSlider.setToolTip("Volume")
-
+        self.volumeSlider.setValue(70)
+        self.volumeSlider.setMinimum(0)
+        self.volumeSlider.setMaximum(100)
+        mixer.music.set_volume(0.7)#in mixer the min is 0 and max is 1 => so we chose 0.7 to indicate the 70 in slider
+        self.volumeSlider.valueChanged.connect(self.setVolume)
         #################Play List###################################
         self.playList=QListWidget()
         self.playList.doubleClicked.connect(self.playSounds)
@@ -115,6 +119,8 @@ class Player(QWidget):
             fileName = os.path.basename(song)
             self.playList.addItem(fileName)
     def playSounds(self):
+        '''pygame works perfectly with .wav format but not with mp3 on ubunto, it might works on window ,
+        but in all cases we can add some lines of code to convert every mp3 files into wav format to avoid any kind of problem'''
         global musicList
         index=self.playList.currentRow()
         print(index)
@@ -127,7 +133,10 @@ class Player(QWidget):
         except:
             print("cant")
 
-
+    def setVolume(self):
+        self.volume=self.volumeSlider.value()
+        #print(self.volume)
+        mixer.music.set_volume(self.volume/100)#0 and 1 for mixer
 
 def main():
     App=QApplication(sys.argv)
