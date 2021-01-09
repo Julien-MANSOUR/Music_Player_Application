@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtWidgets import*
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize,Qt
-
+import os
 class Player(QWidget):
     def __init__(self):
         super().__init__()
@@ -22,6 +22,7 @@ class Player(QWidget):
         self.addButton.setIcon(QIcon("images/add.png"))
         self.addButton.setIconSize(QSize(48,48))
         self.addButton.setToolTip("Add a Song")# just adding a hint to my buttons
+        self.addButton.clicked.connect(self.addSound)
 
         self.shuffleButton = QToolButton()  # im using toolbutton bcz it is better to use icons to it
         self.shuffleButton.setIcon(QIcon("images/shuffle.png"))
@@ -35,7 +36,7 @@ class Player(QWidget):
 
         self.playButton = QToolButton()  # im using toolbutton bcz it is better to use icons to it
         self.playButton.setIcon(QIcon("images/play.png"))
-        self.playButton.setIconSize(QSize(48, 48))
+        self.playButton.setIconSize(QSize(64, 64))
         self.playButton.setToolTip("Add a Song")  # just adding a hint to my buttons
 
         self.nextButton = QToolButton()  # im using toolbutton bcz it is better to use icons to it
@@ -86,6 +87,13 @@ class Player(QWidget):
         self.mainLayout.addWidget(self.topGroupBox,25)#topgroupebox is a widget and not a layout
         self.mainLayout.addLayout(self.bottomLayout,75)
         self.setLayout(self.mainLayout)
+
+    def addSound(self):
+        dir=QFileDialog.getOpenFileName(self,"Add Sound","","Sound Files (*.mp3 *.ogg *.wav)")#PyGame can play our sounds : mp3,ogg,wav
+        #dir => a tuple : (c:/users/Pc/Sounds/red.mp3 , Sound Files((*.mp3 *.ogg *.wav) )
+        fileName=os.path.basename(dir[0])
+        #fileName => red.mp3 ,we need just the base name so we can play the song later
+        self.playList.addItem(fileName)
 
 def main():
     App=QApplication(sys.argv)
