@@ -6,7 +6,7 @@ import os
 import random
 from pygame import mixer
 musicList=[]
-
+muted=False
 #if you want to utilse mixer you should initialise it
 mixer.init()#global initialisation outside the classs
 
@@ -57,6 +57,7 @@ class Player(QWidget):
         self.muteButton.setIcon(QIcon("images/mute.png"))
         self.muteButton.setIconSize(QSize(24, 24))
         self.muteButton.setToolTip("Mute")  # just adding a hint to my buttons
+        self.muteButton.clicked.connect(self.muteSound)
         ###################Volume Slider##############################
         self.volumeSlider=QSlider(Qt.Horizontal)
         self.volumeSlider.setToolTip("Volume")
@@ -138,6 +139,20 @@ class Player(QWidget):
         #print(self.volume)
         mixer.music.set_volume(self.volume/100)#0 and 1 for mixer
 
+    def muteSound(self):
+        global muted
+        if muted == False:
+            mixer.music.set_volume(0.0)
+            muted = True
+            self.muteButton.setIcon(QIcon("images/unmuted.png"))
+            self.muteButton.setToolTip("UnMute")
+            self.volumeSlider.setValue(0)
+        else:
+            mixer.music.set_volume(0.7)
+            muted = False
+            self.muteButton.setIcon(QIcon("images/mute.png"))
+            self.muteButton.setToolTip("Mute")
+            self.volumeSlider.setValue(70)
 def main():
     App=QApplication(sys.argv)
     window=Player()
