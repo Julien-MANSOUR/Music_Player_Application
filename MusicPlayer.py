@@ -4,6 +4,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize,Qt,QTimer
 import os
 import random , time
+import Style
 from pygame import mixer
 from mutagen.mp3 import MP3
 from mutagen.wave import WAVE #i used wave bcz mp3 isnt working
@@ -30,7 +31,8 @@ class Player(QWidget):
     def widgets(self):
         #######################prog bar###########
         self.progressBar=QProgressBar()
-        self.progressBar.setTextVisible(False)#pour enlever le % 
+        self.progressBar.setTextVisible(False)#pour enlever le %
+        self.progressBar.setStyleSheet(Style.progressBarStyle())#we use parenthese bcz its is outside of the class
         #####################Labels################
         self.songTimerLabel=QLabel("0:00")
         self.songLengthLabel=QLabel("/ 0:00")
@@ -82,6 +84,7 @@ class Player(QWidget):
         #################Play List###################################
         self.playList=QListWidget()
         self.playList.doubleClicked.connect(self.playSounds)
+        self.playList.setStyleSheet(Style.playListStyle())
         ##################Timer##################################3
         self.timer=QTimer()
         self.timer.setInterval(1000)
@@ -116,7 +119,7 @@ class Player(QWidget):
         self.topMainLayout.addLayout(self.topLayout)
         self.topMainLayout.addLayout(self.middleLayout)
         self.topGroupBox.setLayout(self.topMainLayout)#so now the top and middle layout are now in a single groupe box forming the upper layout of main window
-        self.topGroupBox.setStyleSheet("background-color : orange")
+        self.topGroupBox.setStyleSheet(Style.groupBoxStyle())#our homemade function
         self.mainLayout.addWidget(self.topGroupBox,25)#topgroupebox is a widget and not a layout
         self.mainLayout.addLayout(self.bottomLayout,75)
         self.setLayout(self.mainLayout)
