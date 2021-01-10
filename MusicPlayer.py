@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import*
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QSize,Qt,QTimer
 import os
-import random
+import random , time
 from pygame import mixer
 from mutagen.mp3 import MP3
 from mutagen.wave import WAVE #i used wave bcz mp3 isnt working
@@ -27,6 +27,11 @@ class Player(QWidget):
     def widgets(self):
         #######################prog bar###########
         self.progressBar=QProgressBar()
+        self.progressBar.setTextVisible(False)#pour enlever le % 
+        #####################Labels################
+        self.songTimerLabel=QLabel("0:00")
+        self.songLengthLabel=QLabel("/ 0:00")
+
         ######################Button################
         self.addButton=QToolButton()#im using toolbutton bcz it is better to use icons to it
         self.addButton.setIcon(QIcon("images/add.png"))
@@ -88,6 +93,8 @@ class Player(QWidget):
         ################Adding Widgets##########################
         ###############Top Layout Widgets#######################
         self.topLayout.addWidget(self.progressBar)
+        self.topLayout.addWidget(self.songTimerLabel)
+        self.topLayout.addWidget(self.songLengthLabel)
         ###############Middle Layout Widgets#######################
         self.middleLayout.addStretch()
         self.middleLayout.addWidget(self.addButton)
@@ -148,6 +155,11 @@ class Player(QWidget):
             print(songLength)#songLength=12.84513153 //we need just the unite
             songLength=round(songLength)
             print(songLength)#=>13
+            min,sec=divmod(songLength,60)#make division par 60 to find minuts and sec
+            #print(min)
+            #print(sec)
+            self.songLengthLabel.setText("/ {}:{}".format(min,sec))
+
             self.progressBar.setMaximum(songLength)
 
         except:
@@ -178,6 +190,9 @@ class Player(QWidget):
         #mutagen package will help us to find the length of our song, so we could know when its over
         count +=1
         self.progressBar.setValue(count)
+        ################updating my Label###############
+        self.songTimerLabel.setText(time.strftime("%M:%S",time.gmtime(count)))#M for minuts and S for seconds
+        ##################################################
         if count == songLength:
             self.timer.stop()
 
