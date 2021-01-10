@@ -10,6 +10,9 @@ from mutagen.wave import WAVE #i used wave bcz mp3 isnt working
 musicList=[]
 muted=False
 songLength =0
+index=0
+
+
 #if you want to utilse mixer you should initialise it
 mixer.init()#global initialisation outside the classs
 count =0 #for timer
@@ -42,24 +45,26 @@ class Player(QWidget):
         self.shuffleButton = QToolButton()  # im using toolbutton bcz it is better to use icons to it
         self.shuffleButton.setIcon(QIcon("images/shuffle.png"))
         self.shuffleButton.setIconSize(QSize(48, 48))
-        self.shuffleButton.setToolTip("Add a Song")  # just adding a hint to my buttons
+        self.shuffleButton.setToolTip("Shuffle Songs")  # just adding a hint to my buttons
         self.shuffleButton.clicked.connect(self.shufflePlayList)
 
         self.previousButton = QToolButton()  # im using toolbutton bcz it is better to use icons to it
         self.previousButton.setIcon(QIcon("images/previous.png"))
         self.previousButton.setIconSize(QSize(48, 48))
-        self.previousButton.setToolTip("Add a Song")  # just adding a hint to my buttons
+        self.previousButton.setToolTip("Previous Song")  # just adding a hint to my buttons
+        self.previousButton.clicked.connect(self.playPrevious)
 
         self.playButton = QToolButton()  # im using toolbutton bcz it is better to use icons to it
         self.playButton.setIcon(QIcon("images/play.png"))
         self.playButton.setIconSize(QSize(64, 64))
-        self.playButton.setToolTip("Add a Song")  # just adding a hint to my buttons
+        self.playButton.setToolTip("Play Song")  # just adding a hint to my buttons
         self.playButton.clicked.connect(self.playSounds)
 
         self.nextButton = QToolButton()  # im using toolbutton bcz it is better to use icons to it
         self.nextButton.setIcon(QIcon("images/next.png"))
         self.nextButton.setIconSize(QSize(48, 48))
-        self.nextButton.setToolTip("Add a Song")  # just adding a hint to my buttons
+        self.nextButton.setToolTip("Next Song")  # just adding a hint to my buttons
+        self.nextButton.clicked.connect(self.nextSong)
 
         self.muteButton = QToolButton()  # im using toolbutton bcz it is better to use icons to it
         self.muteButton.setIcon(QIcon("images/mute.png"))
@@ -133,12 +138,16 @@ class Player(QWidget):
         for song in musicList:
             fileName = os.path.basename(song)
             self.playList.addItem(fileName)
+
+
     def playSounds(self):
         '''pygame works perfectly with .wav format but not with mp3 on ubunto, it might works on window ,
         but in all cases we can add some lines of code to convert every mp3 files into wav format to avoid any kind of problem'''
         global musicList
         global songLength
         global  count
+        global index
+        
         count =0 #so our progressbar start freshly from zero and not the last accumulated number
         index=self.playList.currentRow()
         print(index)
@@ -159,6 +168,76 @@ class Player(QWidget):
             #print(min)
             #print(sec)
             self.songLengthLabel.setText("/ {}:{}".format(min,sec))
+
+            self.progressBar.setMaximum(songLength)
+
+        except:
+            print("cant")
+
+
+    def playPrevious(self):
+        global musicList
+        global songLength
+        global count
+        global index
+
+        count = 0  # so our progressbar start freshly from zero and not the last accumulated number
+        #index = self.playList.currentRow()
+        items=self.playList.count()#how many items in the playlist
+        print("items",items)
+        #bcz when there is no more songs to choose in previous mode we go to the last one de nouveau
+        if index == 0:
+            index=items #means the last one so we can use previous button de nouveau
+        index -=1 #for previous
+        print("current index",index)
+        # we use index for each song so we can play it
+        try:
+            mixer.init(frequency=22050, size=-16, channels=2, buffer=4096)
+            mixer.music.load(str(musicList[index]))
+            self.progressBar.setValue(0)  # start a fresh start
+            mixer.music.play()
+            self.timer.start()  # i should start my timer whenever i start the music
+            sound = WAVE(str(musicList[index]))  # our song
+            songLength = sound.info.length  # we took the length
+            songLength = round(songLength)
+            min, sec = divmod(songLength, 60)  # make division par 60 to find minuts and sec
+            # print(min)
+            # print(sec)
+            self.songLengthLabel.setText("/ {}:{}".format(min, sec))
+
+            self.progressBar.setMaximum(songLength)
+
+        except:
+            print("cant")
+
+    def nextSong(self):
+        global musicList
+        global songLength
+        global count
+        global index
+
+        count = 0  # so our progressbar start freshly from zero and not the last accumulated number
+        # index = self.playList.currentRow()
+        items = self.playList.count()  # how many items in the playlist
+        # bcz when there is no more songs to choose in previous mode we go to the last one de nouveau
+        index += 1
+        if index == items:
+            index = 0
+        print("current index",index)
+        # we use index for each song so we can play it
+        try:
+            mixer.init(frequency=22050, size=-16, channels=2, buffer=4096)
+            mixer.music.load(str(musicList[index]))
+            self.progressBar.setValue(0)  # start a fresh start
+            mixer.music.play()
+            self.timer.start()  # i should start my timer whenever i start the music
+            sound = WAVE(str(musicList[index]))  # our song
+            songLength = sound.info.length  # we took the length
+            songLength = round(songLength)
+            min, sec = divmod(songLength, 60)  # make division par 60 to find minuts and sec
+            # print(min)
+            # print(sec)
+            self.songLengthLabel.setText("/ {}:{}".format(min, sec))
 
             self.progressBar.setMaximum(songLength)
 
